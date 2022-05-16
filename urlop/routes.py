@@ -68,7 +68,7 @@ def leave(name):
     else:
         leaves = User.query.filter_by(username=current_user.username).first().leave
 
-    if form_search.validate_on_submit():
+    if form_search.validate_on_submit() and form_search.searchText.data:
         if User.query.filter_by(username=form_search.searchText.data.strip()).first() is None:
             leaves = Leave.query.all()
             flash('Nie ma takiego pracownika', 'danger')

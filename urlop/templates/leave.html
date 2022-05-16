@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
     <h1>Zalogowany jako {{ current_user.username }}</h1>
-    <form method="POST" action="">
-            {{ form_search.hidden_tag() }}
-            {{ form_search.searchText.label(class="form-label") }}
-            {{ form_search.searchText(class="form-control") }}
-            <br>
-            {{ form_search.submit(class="btn btn-primary") }}
-    </form>
+    {% if current_user.role == 'Admin' %}
+        <form method="POST" action="">
+                {{ form_search.hidden_tag() }}
+                {{ form_search.searchText.label(class="form-label") }}
+                {{ form_search.searchText(class="form-control") }}
+                <br>
+                {{ form_search.submitSearch(class="btn btn-primary") }}
+        </form>
+    {% endif %}
     <h3>Pozostało ci {{ current_user.days_left }} dni urlopu</h3>
-    <div class="list-group">
+    <div class="list-group mt-5">
         {% for leave in leaves %}
             <div class="list-group-item">
                 <h7 class="fw-bolder">{{leave.user.username}}</h7>: {{ leave.start_day.date() }} - {{ leave.end_day.date() }}

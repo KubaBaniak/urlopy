@@ -57,4 +57,4 @@ class LeaveForm(FlaskForm):
 
 class SearchForm(FlaskForm):
     searchText = StringField('Wyszukaj pracownika')
-    submit = SubmitField('Znajdź')
+    submitSearch = SubmitField('Znajdź')
