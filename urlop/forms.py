@@ -40,7 +40,7 @@ class LeaveForm(FlaskForm):
     def validate_display_days_errors(self, display_days_errors):
         days = User.query.filter_by(username=current_user.username).first().days_left
         print(self.start_date.data)
-        if self.start_date.data <= date.today():
+        if self.start_date.data < date.today():
             raise ValidationError('You have selected this day or one from the past. Please select an upcoming day')
         if days < (self.end_date.data - self.start_date.data).days:
             raise ValidationError('You have no days left')

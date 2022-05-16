@@ -15,29 +15,47 @@
         {% for leave in leaves %}
             <div class="list-group-item">
                 <h7 class="fw-bolder">{{leave.user.username}}</h7>: {{ leave.start_day.date() }} - {{ leave.end_day.date() }}
+                <br>
+                ({{
+                (leave.end_day.date() - leave.start_day.date()).days
+                }} dni)
                 {% if current_user.role == 'Admin' %}
-                    <p>
-                    Accepted:
+                <br>
+
                         {% if leave.accepted %}
-                        <a href="{{url_for('change_accept', leave_id=leave.id)}}" class="text-success  text-decoration-none">
-                        ✓
-                        </a>
+                            <a href="{{url_for('change_accept', leave_id=leave.id)}}" role="button" class="btn btn-success mt-2">
+                                Zaakceptowano
+                            </a>
                         {% else %}
-                        <a href="{{url_for('change_accept', leave_id=leave.id)}}" class="text-danger text-decoration-none">
-                        ✗
-                        </a>
+                            <a href="{{url_for('change_accept', leave_id=leave.id)}}" role="button" class="btn btn-danger mt-2">
+                                Odrzucono
+                            </a>
                     {% endif %}
                     </p>
-                    <button type="button" class="btn btn-danger">
-                        <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="link-light text-decoration-none">
-                            Usuń
-                        </a>
-                    </button>
+                    <div>
+                      <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Usuń urlop
+                      </a>
+
+                      <ul class="dropdown-menu bg-danger" aria-labelledby="dropdownMenuLink">
+                        <li  class="dropdown-item button button-danger  bg-danger" role="button">
+                            <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="text-white">
+                            Na pewno?
+                            </a>
+                        </li>
+                      </ul>
+                    </div>
+<!--                    <button type="button" class="btn btn-danger">-->
+<!--                        <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="link-light text-decoration-none">-->
+<!--                            Usuń-->
+<!--                        </a>-->
+<!--                    </button>-->
+                    <p>Pozostałe dni {{leave.user.days_left}}</p>
                 {% else %}
                     {% if leave.accepted %}
-                        <p class="fs-2 text-success">Accepted: ✓  </p>
+                        <p class="fs-2 text-success">Zaakceptowano  </p>
                     {% else %}
-                        <p class="fs-2 text-danger">Accepted: ✗ </p>
+                        <p class="fs-2 text-danger">Odrzucono </p>
                     {% endif %}
                 {% endif %}
             </div>
@@ -54,6 +72,7 @@
             {{ error }}
         </p>
     {% endfor %}
+
     <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#sendModal">
         Złóż wniosek o urlop
     </button>
@@ -72,7 +91,7 @@
 {% endblock content %}
 
 {% block modal %}
-<!-- Modal -->
+<!-- Modal to add -->
 <div class="modal fade" id="sendModal" tabindex="-1" aria-labelledby="sendModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -99,14 +118,6 @@
         </div>
     </form>
       </div>
-<!--      <div class="modal-footer">-->
-<!--        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
-<!--                      {{ form.submit(class="btn btn-primary") }}-->
-
-<!--        <form method="POST" action="">-->
-<!--            {{ form.hidden_tag() }}-->
-<!--        </form>-->
-<!--      </div>-->
     </div>
   </div>
 </div>
