@@ -9,36 +9,38 @@
             {{ form_search.submit(class="btn btn-primary") }}
     </form>
     <h3>Pozostało ci {{ current_user.days_left }} dni urlopu</h3>
-    {% for leave in leaves %}
-        <div class="border border-dark border-3 rounded-5 m-1">
-            <h7 class="fw-bolder">{{leave.user.username}}</h7>: {{ leave.start_day.date() }} - {{ leave.end_day.date() }}
-            {% if current_user.role == 'Admin' %}
-                <p>
-                Accepted:
-                    {% if leave.accepted %}
-                    <a href="{{url_for('change_accept', leave_id=leave.id)}}" class="text-success  text-decoration-none">
-                    ✓
-                    </a>
-                    {% else %}
-                    <a href="{{url_for('change_accept', leave_id=leave.id)}}" class="text-danger text-decoration-none">
-                    ✗
-                    </a>
-                {% endif %}
-                </p>
-                <button type="button" class="btn btn-danger">
-                    <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="link-light text-decoration-none">
-                        Usuń
-                    </a>
-                </button>
-            {% else %}
-                {% if leave.accepted %}
-                    <p class="fs-2 text-success">Accepted: ✓  </p>
+    <div class="list-group">
+        {% for leave in leaves %}
+            <div class="list-group-item">
+                <h7 class="fw-bolder">{{leave.user.username}}</h7>: {{ leave.start_day.date() }} - {{ leave.end_day.date() }}
+                {% if current_user.role == 'Admin' %}
+                    <p>
+                    Accepted:
+                        {% if leave.accepted %}
+                        <a href="{{url_for('change_accept', leave_id=leave.id)}}" class="text-success  text-decoration-none">
+                        ✓
+                        </a>
+                        {% else %}
+                        <a href="{{url_for('change_accept', leave_id=leave.id)}}" class="text-danger text-decoration-none">
+                        ✗
+                        </a>
+                    {% endif %}
+                    </p>
+                    <button type="button" class="btn btn-danger">
+                        <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="link-light text-decoration-none">
+                            Usuń
+                        </a>
+                    </button>
                 {% else %}
-                    <p class="fs-2 text-danger">Accepted: ✗ </p>
+                    {% if leave.accepted %}
+                        <p class="fs-2 text-success">Accepted: ✓  </p>
+                    {% else %}
+                        <p class="fs-2 text-danger">Accepted: ✗ </p>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </div>
-    {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 <!--    show errors-->
     {% for error in form.end_date.errors %}
         <p class="text-danger">
