@@ -34,7 +34,7 @@
                data-bs-toggle="dropdown" aria-expanded="false">
                 Opcje
             </a>
-            <ul class="dropdown-menu text-center" aria-labelledby="accept">
+            <ul class="dropdown-menu text-center border border-dark" aria-labelledby="accept">
                 <li class="dropdown-item button button-danger" role="button">
                     <a href="{{url_for('change_accept', leave_id=leave.id, option=1)}}" role="button"
                        class="btn btn-success mt-2">
@@ -63,7 +63,7 @@
                 Usuń urlop
             </a>
 
-            <ul class="dropdown-menu bg-danger text-center" aria-labelledby="dropdownMenuLink">
+            <ul class="dropdown-menu bg-danger text-center border border-dark" aria-labelledby="dropdownMenuLink">
                 <li class="dropdown-item button button-danger  bg-danger" role="button">
                     <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="text-white">
                         Na pewno?
