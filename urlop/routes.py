@@ -21,6 +21,7 @@ def calculate_days(start_date, end_date):
         start_date += delta
     return days
 
+
 @app.route('/')
 def index():
     return render_template('index.html', title='Strona główna')
@@ -73,13 +74,13 @@ def logout():
 
 @app.route('/leave/<string:name>', methods=['POST', 'GET'])
 def leave(name):
-    form = LeaveForm()
-    form_search = SearchForm()
-
     if current_user.role == 'Admin':
         leaves = Leave.query.all()
     else:
         leaves = User.query.filter_by(username=current_user.username).first().leave
+
+    form_search = SearchForm()
+    form = LeaveForm()
 
     if form_search.validate_on_submit() and form_search.searchText.data:
         if User.query.filter_by(username=form_search.searchText.data.strip()).first() is None:
@@ -93,13 +94,16 @@ def leave(name):
                                leaves=leaves,
                                title=name,
                                form_search=form_search)
-    if form.validate_on_submit():
+
+    if form.start_date.data and form.validate_on_submit():
+        print('????????????')
         start_date = form.start_date.data
         end_date = form.end_date.data
         leave = Leave(start_day=start_date, end_day=end_date, user=current_user)
         db.session.add(leave)
         db.session.commit()
         return redirect(url_for('leave', name=current_user.username))
+
     return render_template('leave.html', form=form, form_search=form_search, leaves=leaves, title=name)
 
 
@@ -124,30 +128,39 @@ def delete_leave(leave_id):
     return redirect(url_for('leave', name=current_user.username))
 
 
-@app.route('/change-accept/<int:leave_id>')
-def change_accept(leave_id):
+@app.route('/change-accept/<int:leave_id>/<int:option>')
+def change_accept(leave_id, option):
     leave = Leave.query.filter_by(id=leave_id).first()
     start_date = leave.start_day
     end_date = leave.end_day
-    user = User.query.filter_by(username = leave.user.username).first_or_404()
-
-    if leave.accepted:
-        user.days_left = user.days_left + calculate_days(start_date, end_date)
+    user = User.query.filter_by(username=leave.user.username).first_or_404()
+    print(option)
+    # accept
+    if option == 1:
+        if leave.accepted != 1:
+            user.days_left = user.days_left - calculate_days(start_date, end_date)
+            leave.accepted = 1
+    # waiting
+    elif option == 0:
+        if leave.accepted != 0:
+            if leave.accepted == 1:
+                user.days_left = user.days_left + calculate_days(start_date, end_date)
+            leave.accepted = 0
+    # refuse
+    elif option == 2:
+        if leave.accepted != 2:
+            if leave.accepted == 1:
+                user.days_left = user.days_left + calculate_days(start_date, end_date)
+            leave.accepted = 2
     else:
-        user.days_left = user.days_left - calculate_days(start_date, end_date)
-    leave.accepted = not leave.accepted
+        return abort(404)
     db.session.commit()
-    print(1)
     return redirect(url_for('leave', name=current_user.username))
 
 
 @app.errorhandler(404)
 def page_not_found(e):
     return e, 404
-
-
-
-
 
 # def to_dict(row):
 #     if row is None:

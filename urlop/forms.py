@@ -51,10 +51,10 @@ class LeaveForm(FlaskForm):
         for leave in user_leaves.leave:
             if (leave.start_day.date() < self.start_date.data < leave.end_day.date()
                     or leave.start_day.date() < self.end_date.data < leave.end_day.date()):
-                print('wtf')
                 raise ValidationError('You are already on a leave between {} and {}'.format(leave.start_day.date(), leave.end_day.date()))
 
 
 class SearchForm(FlaskForm):
     searchText = StringField('Wyszukaj pracownika')
     submitSearch = SubmitField('Znajdź')
+

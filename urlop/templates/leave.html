@@ -1,124 +1,140 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Zalogowany jako {{ current_user.username }}</h1>
-    {% if current_user.role == 'Admin' %}
-        <form method="POST" action="">
-                {{ form_search.hidden_tag() }}
-                {{ form_search.searchText.label(class="form-label") }}
-                {{ form_search.searchText(class="form-control") }}
-                <br>
-                {{ form_search.submitSearch(class="btn btn-primary") }}
-        </form>
-    {% endif %}
-    <h3>Pozostało ci {{ current_user.days_left }} dni urlopu</h3>
-    <div class="list-group mt-5">
-        {% for leave in leaves %}
-            <div class="list-group-item">
-                <h7 class="fw-bolder">{{leave.user.username}}</h7>: {{ leave.start_day.date() }} - {{ leave.end_day.date() }}
-                <br>
-                ({{
-                (leave.end_day.date() - leave.start_day.date()).days
-                }} dni)
-                {% if current_user.role == 'Admin' %}
-                <br>
+<h1>Zalogowany jako {{ current_user.username }}</h1>
+{% if current_user.role == 'Admin' %}
+<form method="POST" action="">
+    {{ form_search.hidden_tag() }}
+    {{ form_search.searchText.label(class="form-label") }}
+    {{ form_search.searchText(class="form-control") }}
+    <br>
+    {{ form_search.submitSearch(class="btn btn-primary") }}
+</form>
+{% endif %}
+<h3>Pozostało ci {{ current_user.days_left }} dni urlopu</h3>
+<div class="list-group mt-5">
+    {% for leave in leaves %}
+    <div class="list-group-item">
+        <h7 class="fw-bolder">{{leave.user.username}}</h7>
+        : {{ leave.start_day.date() }} - {{ leave.end_day.date() }}
+        <br>
+        {% if leave.accepted == 1 %}
+        <h5 class="text-success">ZAAKCEPTOWANO</h5>
+        {% elif leave.accepted == 0 %}
+        <h5 class="text-warning">OCZEKUJE</h5>
+        {% else %}
+        <h5 class="text-danger">ODRZUCONO</h5>
+        {% endif %}
+        ({{ (leave.end_day.date() - leave.start_day.date()).days }} dni)
+        {% if current_user.role == 'Admin' %}
+        <br>
 
-                        {% if leave.accepted %}
-                            <a href="{{url_for('change_accept', leave_id=leave.id)}}" role="button" class="btn btn-success mt-2">
-                                Zaakceptowano
-                            </a>
-                        {% else %}
-                            <a href="{{url_for('change_accept', leave_id=leave.id)}}" role="button" class="btn btn-danger mt-2">
-                                Odrzucono
-                            </a>
-                    {% endif %}
-                    </p>
-                    <div>
-                      <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                        Usuń urlop
-                      </a>
-
-                      <ul class="dropdown-menu bg-danger" aria-labelledby="dropdownMenuLink">
-                        <li  class="dropdown-item button button-danger  bg-danger" role="button">
-                            <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="text-white">
-                            Na pewno?
-                            </a>
-                        </li>
-                      </ul>
-                    </div>
-<!--                    <button type="button" class="btn btn-danger">-->
-<!--                        <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="link-light text-decoration-none">-->
-<!--                            Usuń-->
-<!--                        </a>-->
-<!--                    </button>-->
-                    <p>Pozostałe dni {{leave.user.days_left}}</p>
-                {% else %}
-                    {% if leave.accepted %}
-                        <p class="fs-2 text-success">Zaakceptowano  </p>
-                    {% else %}
-                        <p class="fs-2 text-danger">Odrzucono </p>
-                    {% endif %}
-                {% endif %}
-            </div>
-        {% endfor %}
-    </div>
-<!--    show errors-->
-    {% for error in form.end_date.errors %}
-        <p class="text-danger">
-            {{ error }}
-        </p>
-    {% endfor %}
-    {% for error in form.display_days_errors.errors %}
-        <p class="text-danger">
-            {{ error }}
-        </p>
-    {% endfor %}
-
-    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#sendModal">
-        Złóż wniosek o urlop
-    </button>
-
-    <nav class="navbar navbar-dark bg-dark rounded-3">
-        <div class="container-sm d-flex justify-content-evenly">
-            {% if current_user.is_authenticated %}
-                    <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
-                    <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
-                {% else %}
-                <a href="{{url_for('login')}}" class="link-light text-decoration-none">Zaloguj się</a>
-                <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
-            {% endif %}
+        <!--        accept dropbox-->
+        <div class="mb-2 mt-2">
+            <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="accept"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                Opcje
+            </a>
+            <ul class="dropdown-menu text-center" aria-labelledby="accept">
+                <li class="dropdown-item button button-danger" role="button">
+                    <a href="{{url_for('change_accept', leave_id=leave.id, option=1)}}" role="button"
+                       class="btn btn-success mt-2">
+                        Zaakceptowano
+                    </a>
+                </li>
+                <li class="dropdown-item button button-danger" role="button">
+                    <a href="{{url_for('change_accept', leave_id=leave.id, option=0)}}" role="button"
+                       class="btn btn-warning mt-2">
+                        Oczekuje
+                    </a>
+                </li>
+                <li class="dropdown-item button button-danger" role="button">
+                    <a href="{{url_for('change_accept', leave_id=leave.id, option=2)}}" role="button"
+                       class="btn btn-danger mt-2">
+                        Odrzucono
+                    </a>
+                </li>
+            </ul>
         </div>
-    </nav>
+
+        <!--        delete dropbox-->
+        <div>
+            <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                Usuń urlop
+            </a>
+
+            <ul class="dropdown-menu bg-danger text-center" aria-labelledby="dropdownMenuLink">
+                <li class="dropdown-item button button-danger  bg-danger" role="button">
+                    <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="text-white">
+                        Na pewno?
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <p>Pozostałe dni {{leave.user.days_left}}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<!--    show errors-->
+{% for error in form.end_date.errors %}
+<p class="text-danger">
+    {{ error }}
+</p>
+{% endfor %}
+{% for error in form.display_days_errors.errors %}
+<p class="text-danger">
+    {{ error }}
+</p>
+{% endfor %}
+
+<button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#sendModal">
+    Złóż wniosek o urlop
+</button>
+
+<nav class="navbar navbar-dark bg-dark rounded-3">
+    <div class="container-sm d-flex justify-content-evenly">
+        {% if current_user.is_authenticated %}
+        <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
+        <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
+        {% else %}
+        <a href="{{url_for('login')}}" class="link-light text-decoration-none">Zaloguj się</a>
+        <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
+        {% endif %}
+    </div>
+</nav>
 {% endblock content %}
 
 {% block modal %}
 <!-- Modal to add -->
 <div class="modal fade" id="sendModal" tabindex="-1" aria-labelledby="sendModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="sendModalLabel">Potwierdzenie urlopu</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-          <p class="border-bottom">Upewnij się, że daty są prawidłowo wybrane !!!</p>
-            <form method="POST" action="">
-        <div class="mb-3 ">
-            {{ form.hidden_tag() }}
-            {{ form.start_date.label(class="form-label") }}
-            {{ form.start_date(class="form-control") }}
-            <br>
-            {{ form.end_date.label(class="form-label") }}
-            {{ form.end_date(class="form-control") }}
-            <br>
-            <div class="d-flex justify-content-evenly">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                {{ form.submit(class="btn btn-primary") }}
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendModalLabel">Potwierdzenie urlopu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <p class="border-bottom">Upewnij się, że daty są prawidłowo wybrane !!!</p>
+                <form method="POST" action="">
+                    <div class="mb-3 ">
+                        {{ form.hidden_tag() }}
+                        {{ form.start_date.label(class="form-label") }}
+                        {{ form.start_date(class="form-control") }}
+                        <br>
+                        {{ form.end_date.label(class="form-label") }}
+                        {{ form.end_date(class="form-control") }}
+                        <br>
+                        <div class="d-flex justify-content-evenly">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
 
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}
