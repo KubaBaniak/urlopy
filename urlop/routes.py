@@ -1,13 +1,12 @@
 import datetime
 
 from flask import render_template, redirect, url_for, request, flash, abort
-from flask_login import login_user, current_user, logout_user, login_required
-from urlop import app, db, bcrypt
+from flask_login import login_user, current_user, logout_user
+from urlop import app, db, bcrypt, mail
 from urlop.models import User, Leave
 from urlop.forms import LoginForm, RegisterForm, LeaveForm, SearchForm
-import pandas as pd
-from flask_bcrypt import Bcrypt
-from datetime import date
+from flask_mail import Message
+from threading import Thread
 
 
 # checking if the day is between friday and sunday and skipping if so
@@ -21,7 +20,17 @@ def calculate_days(start_date, end_date):
         start_date += delta
     return days
 
+def send_email(msg):
+    with app.app_context():
+        mail.send(msg)
 
+def create_and_send_admin(leave, name):
+    msg = Message('{} dodał swój urlop'.format(name), sender='noreply@demo.com')
+    msg.body = f'''Użytkownik {name} dodał propozycję swojegu urlopu.
+    Aby zatwierdzić albo odrzucić kliknij w link {url_for('index')}
+    '''
+    thr = Thread(target=send_email, args=[msg])
+    thr.start()
 @app.route('/')
 def index():
     return render_template('index.html', title='Strona główna')
@@ -102,6 +111,7 @@ def leave(name):
         leave = Leave(start_day=start_date, end_day=end_date, user=current_user)
         db.session.add(leave)
         db.session.commit()
+        # create_and_send_admin(leave, current_user.username)
         return redirect(url_for('leave', name=current_user.username))
 
     return render_template('leave.html', form=form, form_search=form_search, leaves=leaves, title=name)

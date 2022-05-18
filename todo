@@ -2,7 +2,7 @@ X Walidatory, gdy daty sie nakladaja
 
 X Popupy z bootstrapa gdy chcesz faktycznie dodac wolne
 
----  Pokazywac z admina ile dni zostało XD
+X  Pokazywac z admina ile dni zostało XD
 
 X Liczyc tylko dni robocze
 
@@ -14,13 +14,13 @@ X Zatwierdzenie usuniecia
 
 X Zaakceptowano/niezaakceptowane zamiast ptaszkow
 
---- 3 opcje, oczekuje, zaakceptowane, odrzucone
+X 3 opcje, oczekuje, zaakceptowane, odrzucone
 
 X cos do wyslania tego do arkusza excela
 
---- mail do pracownika i admina o to czy cos sie zadzialo (multithreading???)
+? mail do pracownika i admina o to czy cos sie zadzialo (multithreading???)
 
---- Mail do ksiegowej gdy zostanie zaakceptowany urlop
+? Mail do ksiegowej gdy zostanie zaakceptowany urlop
 
 X obok daty rozpoczecia i zakonczenia dodac ilosc dni urlopu (roboczych) i dni wolne od pracy
 (świeta ifami????)
