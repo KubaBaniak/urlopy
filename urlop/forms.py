@@ -49,9 +49,10 @@ class LeaveForm(FlaskForm):
         # checks if user is already on a leave on specific day
         user_leaves = User.query.filter_by(username=current_user.username).first()
         for leave in user_leaves.leave:
-            if (leave.start_day.date() < self.start_date.data < leave.end_day.date()
-                    or leave.start_day.date() < self.end_date.data < leave.end_day.date()):
-                raise ValidationError('You are already on a leave between {} and {}'.format(leave.start_day.date(), leave.end_day.date()))
+            if leave.accepted != 1:
+                if (leave.start_day.date() < self.start_date.data < leave.end_day.date()
+                        or leave.start_day.date() < self.end_date.data < leave.end_day.date()):
+                    raise ValidationError('You are already on a leave between {} and {}'.format(leave.start_day.date(), leave.end_day.date()))
 
 
 class SearchForm(FlaskForm):

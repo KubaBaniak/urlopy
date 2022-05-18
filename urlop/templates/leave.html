@@ -11,7 +11,7 @@
 </form>
 {% endif %}
 <h3>Pozostało ci {{ current_user.days_left }} dni urlopu</h3>
-<div class="list-group mt-5">
+<div class="list-group mt-3">
     {% for leave in leaves %}
     <div class="list-group-item">
         <h7 class="fw-bolder">{{leave.user.username}}</h7>
@@ -29,8 +29,8 @@
         <br>
 
         <!--        accept dropbox-->
-        <div class="mb-2 mt-2">
-            <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="accept"
+        <div class="mb-2 mt-2 dropdown">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="accept"
                data-bs-toggle="dropdown" aria-expanded="false">
                 Opcje
             </a>
@@ -42,14 +42,12 @@
                     </a>
                 </li>
                 <li class="dropdown-item button button-danger" role="button">
-                    <a href="{{url_for('change_accept', leave_id=leave.id, option=0)}}" role="button"
-                       class="btn btn-warning mt-2">
+                    <a href="{{url_for('change_accept', leave_id=leave.id, option=0)}}" role="button" class="btn btn-warning mt-2">
                         Oczekuje
                     </a>
                 </li>
                 <li class="dropdown-item button button-danger" role="button">
-                    <a href="{{url_for('change_accept', leave_id=leave.id, option=2)}}" role="button"
-                       class="btn btn-danger mt-2">
+                    <a href="{{url_for('change_accept', leave_id=leave.id, option=2)}}" role="button" class="btn btn-danger mt-2">
                         Odrzucono
                     </a>
                 </li>
@@ -63,9 +61,9 @@
                 Usuń urlop
             </a>
 
-            <ul class="dropdown-menu bg-danger text-center border border-dark" aria-labelledby="dropdownMenuLink">
-                <li class="dropdown-item button button-danger  bg-danger" role="button">
-                    <a href="{{url_for('delete_leave', leave_id=leave.id)}}" class="text-white">
+            <ul class="dropdown-menu text-center border border-dark" aria-labelledby="dropdownMenuLink">
+                <li class="dropdown-item button button-danger" role="button">
+                    <a href="{{url_for('delete_leave', leave_id=leave.id)}}"  role="button" class="btn btn-danger mt-2">
                         Na pewno?
                     </a>
                 </li>

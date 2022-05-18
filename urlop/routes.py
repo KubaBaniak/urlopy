@@ -20,17 +20,21 @@ def calculate_days(start_date, end_date):
         start_date += delta
     return days
 
+
 def send_email(msg):
     with app.app_context():
         mail.send(msg)
 
-def create_and_send_admin(leave, name):
-    msg = Message('{} dodał swój urlop'.format(name), sender='noreply@demo.com')
+
+def create_and_send_admin(name):
+    msg = Message('{} dodał swój urlop'.format(name), sender=app.config['MAIL_USERNAME'], recipients=['kuba121201@gmail.com'])
     msg.body = f'''Użytkownik {name} dodał propozycję swojegu urlopu.
-    Aby zatwierdzić albo odrzucić kliknij w link {url_for('index')}
+    Aby zatwierdzić albo odrzucić kliknij w link http://127.0.0.1:5000{url_for('index')}
     '''
     thr = Thread(target=send_email, args=[msg])
     thr.start()
+
+
 @app.route('/')
 def index():
     return render_template('index.html', title='Strona główna')
@@ -105,13 +109,13 @@ def leave(name):
                                form_search=form_search)
 
     if form.start_date.data and form.validate_on_submit():
-        print('????????????')
         start_date = form.start_date.data
         end_date = form.end_date.data
         leave = Leave(start_day=start_date, end_day=end_date, user=current_user)
         db.session.add(leave)
         db.session.commit()
-        # create_and_send_admin(leave, current_user.username)
+        if current_user.username != 'Admin':
+            create_and_send_admin(current_user.username)
         return redirect(url_for('leave', name=current_user.username))
 
     return render_template('leave.html', form=form, form_search=form_search, leaves=leaves, title=name)
@@ -130,9 +134,8 @@ def clear():
 def delete_leave(leave_id):
     leave_list = Leave.query.filter_by(id=leave_id)
     leave = leave_list.first()
-
-    leave.user.days_left = leave.user.days_left + calculate_days(leave.start_day, leave.end_day)
-    # leave.user.days_left += abs(leave.start_day - leave.end_day).days
+    if leave.accepted == 1:
+        leave.user.days_left = leave.user.days_left + calculate_days(leave.start_day, leave.end_day)
     leave_list.delete()
     db.session.commit()
     return redirect(url_for('leave', name=current_user.username))
@@ -144,7 +147,6 @@ def change_accept(leave_id, option):
     start_date = leave.start_day
     end_date = leave.end_day
     user = User.query.filter_by(username=leave.user.username).first_or_404()
-    print(option)
     # accept
     if option == 1:
         if leave.accepted != 1:
@@ -152,16 +154,14 @@ def change_accept(leave_id, option):
             leave.accepted = 1
     # waiting
     elif option == 0:
-        if leave.accepted != 0:
-            if leave.accepted == 1:
-                user.days_left = user.days_left + calculate_days(start_date, end_date)
-            leave.accepted = 0
+        if leave.accepted == 1:
+            user.days_left = user.days_left + calculate_days(start_date, end_date)
+        leave.accepted = 0
     # refuse
     elif option == 2:
-        if leave.accepted != 2:
-            if leave.accepted == 1:
-                user.days_left = user.days_left + calculate_days(start_date, end_date)
-            leave.accepted = 2
+        if leave.accepted == 1:
+            user.days_left = user.days_left + calculate_days(start_date, end_date)
+        leave.accepted = 2
     else:
         return abort(404)
     db.session.commit()
