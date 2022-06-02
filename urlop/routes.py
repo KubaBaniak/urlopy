@@ -28,15 +28,18 @@ def send_email(msg):
 
 
 def create_and_send_admin(name):
-    msg = Message('{} dodał swój urlop'.format(name), sender=app.config['MAIL_USERNAME'], recipients=['kuba121201@gmail.com'])
+    msg = Message('{} dodał swój urlop'.format(name), sender=app.config['MAIL_USERNAME'],
+                  recipients=['kuba121201@gmail.com'])
     msg.body = f'''Użytkownik {name} dodał propozycję swojegu urlopu.
     Aby zatwierdzić albo odrzucić kliknij w link http://127.0.0.1:5000{url_for('index')}
     '''
     thr = Thread(target=send_email, args=[msg])
     thr.start()
 
+
 def accepted_leave_mail(start_date, end_date, receiver, state):
-    msg = Message('Twój urlop został {}'.format(state), sender=app.config['MAIL_USERNAME'], recipients=['kuba121201@gmail.com'])
+    msg = Message('Twój urlop został {}'.format(state), sender=app.config['MAIL_USERNAME'],
+                  recipients=['kuba121201@gmail.com'])
     msg.body = f'''Twój urlop od {start_date.date()} do {end_date.date()} został {state}. 
     Kliknij w link http://127.0.0.1:5000{url_for('index')} aby dowiedzieć się więcej.
     '''
@@ -96,7 +99,7 @@ def logout():
 
 @app.route('/leave/<string:name>', methods=['POST', 'GET'])
 @login_required
-def leave(name):
+def leave(name, opt=None):
     if current_user.role == 'Admin':
         leaves = Leave.query.filter_by(deleted=False).all()
     else:
@@ -132,6 +135,8 @@ def leave(name):
             create_and_send_admin(current_user.username)
         return redirect(url_for('leave', name=current_user.username))
 
+    if opt is not None:
+        pass
     return render_template('leave.html',
                            users=User.query.all(),
                            form=form,
@@ -149,8 +154,33 @@ def leave_history():
     return render_template('leave_history.html', leaves=leaves, days_fun=calculate_days)
 
 
+@app.route('/leave-history/admin', methods=['POST', 'GET'])
+@login_required
+def leave_history_admin():
+    if current_user.role != 'Admin':
+        abort(403)
+    form_search = SearchForm()
+    if form_search.validate_on_submit() and form_search.searchText.data:
+        leaves = User.query.filter_by(username=form_search.searchText.data).first()
+        if leaves is None:
+            leaves = Leave.query.filter_by(deleted=False).all()
+            flash('Nie ma takiego pracownika', 'danger')
+        else:
+            flash('{} znaleziony'.format(form_search.searchText.data), 'success')
+            leaves = User.query.filter_by(username=form_search.searchText.data.strip()).first().leave
+            leaves = [leave for leave in leaves if leave.deleted is False]
+        return render_template('leave_history_admin.html',
+                               leaves=leaves[::-1],
+                               form_search=form_search,
+                               days_fun=calculate_days)
+    leaves = Leave.query.all()
+    return render_template('leave_history_admin.html', form_search=form_search, leaves=leaves[::-1], days_fun=calculate_days)
+
+
 @app.route('/clear')
 def clear():
+    if current_user.role != 'Admin':
+        abort(403)
     Leave.query.delete()
     user = User.query.filter_by(username=current_user.username).first()
     user.days_left = 26
@@ -160,6 +190,8 @@ def clear():
 
 @app.route('/delete-leave/<int:leave_id>', methods=['GET', 'POST'])
 def delete_leave(leave_id):
+    if current_user.role != 'Admin':
+        abort(403)
     leave_list = Leave.query.filter_by(id=leave_id)
     leave = leave_list.first()
     if leave.accepted == 1:
@@ -171,6 +203,8 @@ def delete_leave(leave_id):
 
 @app.route('/change-accept/<int:leave_id>/<int:option>')
 def change_accept(leave_id, option):
+    if current_user.role != 'Admin':
+        abort(403)
     leave = Leave.query.filter_by(id=leave_id).first()
     start_date = leave.start_day
     end_date = leave.end_day

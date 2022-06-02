@@ -35,6 +35,9 @@
 <nav class="navbar navbar-dark bg-dark rounded-3">
     <div class="container-sm d-flex justify-content-evenly">
         <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
+        {% if current_user.role == 'Admin' %}
+            <a href="{{url_for('leave_history_admin')}}" class="link-light text-decoration-none">Historia wszystkich</a>
+        {% endif %}
         <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
     </div>
 </nav>
