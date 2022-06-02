@@ -11,70 +11,85 @@
 </form>
 {% endif %}
 <h3>Pozostało ci {{ current_user.days_left }} dni urlopu</h3>
-<div class="list-group mt-3">
-    {% for leave in leaves %}
-    <div class="list-group-item">
-        <h7 class="fw-bolder">{{leave.user.username}}</h7>
-        : {{ leave.start_day.date() }} - {{ leave.end_day.date() }}
-        <br>
-        {% if leave.accepted == 1 %}
-        <h5 class="text-success">ZAAKCEPTOWANO</h5>
-        {% elif leave.accepted == 0 %}
-        <h5 class="text-warning">OCZEKUJE</h5>
-        {% else %}
-        <h5 class="text-danger">ODRZUCONO</h5>
-        {% endif %}
-        ({{ (leave.end_day.date() - leave.start_day.date()).days }} dni)
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Osoba</th>
+        <th scope="col">Początek urlopu</th>
+        <th scope="col">Koniec urlopu</th>
+        <th scope="col">Ilość dni</th>
+        <th scope="col">Stan urlopu</th>
         {% if current_user.role == 'Admin' %}
-        <br>
-
-        <!--        accept dropbox-->
-        <div class="mb-2 mt-2 dropdown">
-            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="accept"
-               data-bs-toggle="dropdown" aria-expanded="false">
-                Opcje
-            </a>
-            <ul class="dropdown-menu text-center border border-dark" aria-labelledby="accept">
-                <li class="dropdown-item button button-danger" role="button">
-                    <a href="{{url_for('change_accept', leave_id=leave.id, option=1)}}" role="button"
-                       class="btn btn-success mt-2">
-                        Zaakceptowano
-                    </a>
-                </li>
-                <li class="dropdown-item button button-danger" role="button">
-                    <a href="{{url_for('change_accept', leave_id=leave.id, option=0)}}" role="button" class="btn btn-warning mt-2">
-                        Oczekuje
-                    </a>
-                </li>
-                <li class="dropdown-item button button-danger" role="button">
-                    <a href="{{url_for('change_accept', leave_id=leave.id, option=2)}}" role="button" class="btn btn-danger mt-2">
-                        Odrzucono
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!--        delete dropbox-->
-        <div>
-            <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-               data-bs-toggle="dropdown" aria-expanded="false">
-                Usuń urlop
-            </a>
-
-            <ul class="dropdown-menu text-center border border-dark" aria-labelledby="dropdownMenuLink">
-                <li class="dropdown-item button button-danger" role="button">
-                    <a href="{{url_for('delete_leave', leave_id=leave.id)}}"  role="button" class="btn btn-danger mt-2">
-                        Na pewno?
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <p>Pozostałe dni {{leave.user.days_left}}</p>
+        <th scope="col"></th>
+        <th scope="col"></th>
         {% endif %}
-    </div>
+    </tr>
+    </thead>
+    <tbody>
+    {% for leave in leaves %}
+    <tr>
+        <th scope="row">{{ loop.index }}</th>
+        <td>{{leave.user.username}}</td>
+        <td>{{leave.start_day.date()}}</td>
+        <td>{{leave.end_day.date()}}</td>
+        <td>{{days_fun(leave.start_day, leave.end_day)}}</td>
+        <td>
+            {% if leave.accepted == 1 %}
+            <h5 class="text-success">ZAAKCEPTOWANO</h5>
+            {% elif leave.accepted == 0 %}
+            <h5 class="text-warning">OCZEKUJE</h5>
+            {% else %}
+            <h5 class="text-danger">ODRZUCONO</h5>
+            {% endif %}
+        </td>
+        {% if current_user.role == 'Admin' %}
+        <td>
+            <div class="mb-2 mt-2 dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="accept"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    Opcje
+                </a>
+                <ul class="dropdown-menu text-center border border-dark" aria-labelledby="accept">
+                    <li class="dropdown-item button button-danger" role="button">
+                        <a href="{{url_for('change_accept', leave_id=leave.id, option=1)}}" role="button"
+                           class="btn btn-success mt-2">
+                            Zaakceptowano
+                        </a>
+                    </li>
+                    <li class="dropdown-item button button-danger" role="button">
+                        <a href="{{url_for('change_accept', leave_id=leave.id, option=0)}}" role="button" class="btn btn-warning mt-2">
+                            Oczekuje
+                        </a>
+                    </li>
+                    <li class="dropdown-item button button-danger" role="button">
+                        <a href="{{url_for('change_accept', leave_id=leave.id, option=2)}}" role="button" class="btn btn-danger mt-2">
+                            Odrzucono
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+        <td>
+            <div class="mb-2 mt-2 dropdown">
+                <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="delete"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    Usuń urlop
+                </a>
+                <ul class="dropdown-menu text-center border border-dark" aria-labelledby="delete">
+                    <li class="dropdown-item button button-danger" role="button">
+                        <a href="{{url_for('delete_leave', leave_id=leave.id)}}" role="button" class="btn btn-danger mt-2">
+                            Na pewno?
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+        {% endif %}
+    </tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 <!--    show errors-->
 {% for error in form.end_date.errors %}
 <p class="text-danger">
@@ -94,8 +109,8 @@
 <nav class="navbar navbar-dark bg-dark rounded-3">
     <div class="container-sm d-flex justify-content-evenly">
         {% if current_user.is_authenticated %}
-        <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
         <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
+        <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
         {% else %}
         <a href="{{url_for('login')}}" class="link-light text-decoration-none">Zaloguj się</a>
         <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
@@ -114,7 +129,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p class="border-bottom">Upewnij się, że daty są prawidłowo wybrane !!!</p>
+                <p class="border-bottom">Upewnij się, że daty są prawidłowo wybrane ! <br>
+                Przykłady: <br>
+                    Urlop jednodniowy - 11.06.2022 do 11.06.2022<br>
+                    Urlop tygodniowy - 13.06.20022 do 20.06.2022
+                </p>
                 <form method="POST" action="">
                     <div class="mb-3 ">
                         {{ form.hidden_tag() }}
@@ -135,4 +154,17 @@
         </div>
     </div>
 </div>
+<!--all users display-->
+{% if current_user.role == 'Admin' %}
+<div class="btn-group m-4">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+        Użytkownicy
+    </button>
+    <ul class="dropdown-menu">
+        {% for user in users %}
+        <li class="dropdown-item">{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 {% endblock %}

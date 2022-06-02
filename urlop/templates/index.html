@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Strona główna</h1>
+    <h1 class="mb-3">Strona główna</h1>
     {% if current_user.is_authenticated %}
-        <h3>Zalogowano jako {{current_user.username}}</h3>
+        <h3 class="mb-3">Zalogowano jako {{current_user.username}}</h3>
     {% endif %}
     <nav class="navbar navbar-dark bg-dark rounded-3">
       <div class="container-fluid d-flex justify-content-evenly">
           {% if current_user.is_authenticated %}
-              <a href="{{ url_for('leave', name=current_user.username)}}" class="link-light text-decoration-none">Urlop</a>
+              <a href="{{ url_for('leave', name=current_user.username)}}" class="link-light text-decoration-none mx-3 my-1">Urlop</a>
+              <a href="{{url_for('leave_history')}}" class="link-light text-decoration-none mx-3 my-1">Historia urlopów</a>
             {% if current_user.role == 'Admin' %}
-              <a href="{{url_for('register')}}" class="link-light text-decoration-none">Zarejestruj konto</a>
+              <a href="{{url_for('register')}}" class="link-light text-decoration-none mx-3 my-1">Zarejestruj konto</a>
             {% endif %}
-              <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
+              <a href="{{url_for('logout')}}" class="link-light text-decoration-none mx-3 my-1">Wyloguj</a>
           {% else %}
-              <a href="{{url_for('login')}}" class="link-light text-decoration-none">Zaloguj się</a>
+              <a href="{{url_for('login')}}" class="link-light text-decoration-none mx-3 my-1">Zaloguj się</a>
           {% endif %}
       </div>
     </nav>

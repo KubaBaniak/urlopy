@@ -24,4 +24,5 @@ class Leave(db.Model, UserMixin):
     start_day = db.Column(db.DateTime, nullable=False)
     end_day = db.Column(db.DateTime, nullable=False)
     accepted = db.Column(db.Integer, unique=False, default=0)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

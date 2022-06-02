@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="mb-5">Twoja historia urlopów</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Początek urlopu</th>
+                <th scope="col">Koniec urlopu</th>
+                <th scope="col">Ilość dni</th>
+                <th scope="col">Stan urlopu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leave in leaves %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{leave.start_day.date()}}</td>
+                <td>{{leave.end_day.date()}}</td>
+                <td>{{days_fun(leave.start_day, leave.end_day)}}</td>
+                <td>
+                    {% if leave.accepted == 1 %}
+                    <h5 class="text-success">ZAAKCEPTOWANO</h5>
+                    {% elif leave.accepted == 0 %}
+                    <h5 class="text-warning">OCZEKUJE</h5>
+                    {% else %}
+                    <h5 class="text-danger">ODRZUCONO</h5>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<nav class="navbar navbar-dark bg-dark rounded-3">
+    <div class="container-sm d-flex justify-content-evenly">
+        <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>
+        <a href="{{url_for('logout')}}" class="link-light text-decoration-none">Wyloguj</a>
+    </div>
+</nav>
+{% endblock %}

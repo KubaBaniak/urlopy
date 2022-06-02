@@ -44,7 +44,7 @@ class LeaveForm(FlaskForm):
             raise ValidationError('You have selected this day or one from the past. Please select an upcoming day')
         if days < (self.end_date.data - self.start_date.data).days:
             raise ValidationError('You have no days left')
-        if self.end_date.data <= self.start_date.data:
+        if self.end_date.data < self.start_date.data:
             raise ValidationError('You have selected a current day, or day before your leave. Please select an day after leaving')
         # checks if user is already on a leave on specific day
         user_leaves = User.query.filter_by(username=current_user.username).first()

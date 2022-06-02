@@ -18,13 +18,42 @@ X 3 opcje, oczekuje, zaakceptowane, odrzucone
 
 X cos do wyslania tego do arkusza excela
 
-? mail do pracownika i admina o to czy cos sie zadzialo (multithreading???)
+X mail do pracownika i admina o to czy cos sie zadzialo (multithreading???)
 
-? Mail do ksiegowej gdy zostanie zaakceptowany urlop
+X Mail do ksiegowej gdy zostanie zaakceptowany urlop
+
 
 X obok daty rozpoczecia i zakonczenia dodac ilosc dni urlopu (roboczych) i dni wolne od pracy
 (świeta ifami????)
 
 X Tylko zaakceptowane urlopy sciagaja dni z reszty dni
 
---- ???
+--- Biala kreska pomiedzy przyciskami menu ???????
+
+XXX ZAAKCEPTOWANO WYSYLA MAILA do prac i ksiegowej, odurzecnie do pracownika
+
+XXX MAIL DO KSIEGOWEJ I PRACOWNIKA GDY ZOSTAL ODRZUCONY Z ZAAKCEPTOWANEGO
+
+XXX HISTORIA WYJAZDOW
+
+XXX (... dni)
+
+--- zmiana hasla przez pracownika LATER
+
+XXX Lista zarejestrowanych kont z mozliwoscia resetu hasla do np qwerty123\
+
+XXX WYSWIETLANIE NA DLUGOSC
+
+XXX URLOP OD DZISIAJ DO DZISIAJ
+
+:((((((( POKAZYWANIE ILE DNI ZOSTALO ZAZNACZONYCH NA PRZYCISKU 'WYSLIJ UPLOP' cant do this in flask
+
+
+--- ADMIN HISTORIA WSZYSTKICH URLOPOW
+
+--- DODAJ MOZLIWOSC PRZYWRACANIA USUNIETYCH WYJAZDOW, I DODAJ POINFOROWANIE ZE ZOSTAL ZARCHIWIZOWANY
+
+--- SWIETA
+
+
+POPOLSKU
