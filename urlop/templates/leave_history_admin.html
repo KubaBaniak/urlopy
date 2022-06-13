@@ -19,6 +19,7 @@
         <th scope="col">Koniec urlopu</th>
         <th scope="col">Ilość dni</th>
         <th scope="col">Stan urlopu</th>
+        <th scope="col">Przywróć urlop</th>
     </tr>
     </thead>
     <tbody>
@@ -38,11 +39,28 @@
             <h5 class="text-danger">ODRZUCONO</h5>
             {% endif %}
         </td>
+        <td>
+            <div class="mb-2 mt-2 dropdown">
+                <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="delete"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                   Przywróć urlop
+                </a>
+                <ul class="dropdown-menu text-center border border-dark" aria-labelledby="delete">
+                    <li class="dropdown-item button button-danger" role="button">
+                        <a href="{{url_for('recover_leave', leave_id=leave.id)}}" role="button" class="btn btn-danger mt-2">
+                            Na pewno?
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
     {% endfor %}
     </tbody>
 </table>
 <p>Sortowane od najnowszego</p>
-<button>Wyslij i pobierz do pdf</button>
+<button class="btn btn-primary mb-3">
+    <a href="{{url_for('exportexcel')}}" class="link-light text-decoration-none">Wyslij i pobierz do pdf</a>
+</button>
 <nav class="navbar navbar-dark bg-dark rounded-3">
     <div class="container-sm d-flex justify-content-evenly">
         <a href="{{url_for('index')}}" class="link-light text-decoration-none">Strona główna</a>

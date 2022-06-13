@@ -1,6 +1,6 @@
 import datetime
 
-from flask import render_template, redirect, url_for, request, flash, abort
+from flask import render_template, redirect, url_for, request, flash, abort, send_file
 from flask_login import login_user, current_user, logout_user, login_required
 from urlop import app, db, bcrypt, mail
 from urlop.models import User, Leave
@@ -8,7 +8,7 @@ from urlop.forms import LoginForm, RegisterForm, LeaveForm, SearchForm
 from flask_mail import Message
 from threading import Thread
 import pandas as pd
-
+import os
 
 # checking if the day is between friday and sunday and skipping if so
 def calculate_days(start_date, end_date):
@@ -232,30 +232,46 @@ def change_accept(leave_id, option):
     db.session.commit()
     return redirect(url_for('leave', name=current_user.username))
 
+@app.route('/recover/<int:leave_id>')
+def recover_leave(leave_id):
+    leave_status = Leave.query.filter_by(id=leave_id).first().deleted
+    Leave.query.filter_by(id=leave_id).first().deleted = True if leave_status is False else False
+    db.session.commit()
+    return redirect(url_for('leave', name=current_user.username))
+
 
 @app.errorhandler(404)
 def page_not_found(e):
     return e, 404
 
-# def to_dict(row):
-#     if row is None:
-#         return None
-#     rtn_dict = dict()
-#     keys = row.__table__.columns.keys()
-#     for key in keys:
-#         rtn_dict[key] = getattr(row, key)
-#     return rtn_dict
-#
-#
-# @app.route('/excel', methods=['GET', 'POST'])
-# def exportexcel():
-#     data = User.query.all()
-#     data_list = [to_dict(item) for item in data]
-#     df = pd.DataFrame(data_list)
-#     filename = app.config['UPLOAD_FOLDER']+"/excel_database.xlsx"
-#     print("Filename: "+filename)
-#
-#     writer = pd.ExcelWriter(filename)
-#     df.to_excel(writer, sheet_name='Registrados')
-#     writer.save()
-#     return redirect('index')
+
+def to_dict(row):
+    if row is None:
+        return None
+    rtn_dict = dict()
+    keys = row.__table__.columns.keys()
+    print(type(row))
+    for key in keys:
+        if key == 'user_id':
+            rtn_dict['username'] = User.query.filter_by(id=getattr(row, key)).first().username
+        elif key != 'password':
+            rtn_dict[key] = getattr(row, key)
+    return rtn_dict
+
+
+@app.route('/excel/download', methods=['GET', 'POST'])
+def exportexcel():
+    if current_user.role != 'Admin':
+        abort(403)
+    filename = app.config['UPLOAD_FOLDER'] + "/excel_database.xlsx"
+    dataframes = list()
+    for i, db_class in enumerate((User.query.all(), Leave.query.all())):
+        data = db_class
+        data_list = [to_dict(item) for item in data]
+        df = pd.DataFrame(data_list)
+        dataframes.append(df)
+    with pd.ExcelWriter(filename) as writer:
+        dataframes[0].to_excel(writer, sheet_name='Dane')
+        dataframes[1].to_excel(writer, sheet_name='Urlopy')
+        writer.save()
+    return send_file(filename, as_attachment=True)
